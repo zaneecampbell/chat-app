@@ -4,7 +4,7 @@ const express = require('express')
 const socketio = require('socket.io')
 
 const app = express()
-// creating the server outside the express library so we can configure it for socket.io
+// creating the server outside the express library so we can configure it for socket.io otherwise express does this for us
 const server = http.createServer(app)
 // socketio wants the raw server to be passed through
 const io = socketio(server)
@@ -14,17 +14,13 @@ const publicDirectoryPath = path.join(__dirname, '../public')
 
 app.use(express.static(publicDirectoryPath))
 
-let count = 0
-
 io.on('connection', (socket) => {
     console.log('New WebSocket connection')
 
-    socket.emit('countUpdated', count)
+    socket.emit('message', 'Welcome!')
 
-    socket.on('increment', () => {
-        count++
-        // socket.emit('countUpdated', count)  Only emits to single connection of origin
-        io.emit('countUpdated', count)         // emits to all at same time
+    socket.on('sendMessage', (message) => {
+        io.emit('message', message)
     })
 })
 
